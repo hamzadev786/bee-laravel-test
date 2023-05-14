@@ -7,4 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
+    public function workShops(){
+        return $this->hasMany(Workshop::class);
+    }
 }

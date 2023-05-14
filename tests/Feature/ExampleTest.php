@@ -24,7 +24,7 @@ class ExampleTest extends TestCase
         $datePast = (new Carbon())->subYear()->setDay(21);
         $dateFuture = (new Carbon())->addYears(1);
 
-        $response = $this->get('/events');
+        $response = $this->get('/api/get-events-with-workshops');
         $response->assertStatus(200)
             ->assertJsonCount(3)
             ->assertJsonPath('0.name', 'Laravel convention '.$datePast->year)
@@ -40,7 +40,7 @@ class ExampleTest extends TestCase
     public function testFutureEvents() {
         $dateFuture = (new Carbon())->addYears(1);
 
-        $response = $this->get('/futureevents');
+        $response = $this->get('/api/get-future-events-with-workshops');
         $response->assertStatus(200)
             ->assertJsonCount(2)
             ->assertJsonPath('0.name', 'Laravel convention '.$dateFuture->year)
@@ -52,7 +52,7 @@ class ExampleTest extends TestCase
     }
 
     public function testMenu() {
-        $response = $this->get('/menu');
+        $response = $this->get('/api/menu-with-child');
         $response->assertStatus(200)
             ->assertJsonCount(1)
             ->assertJsonPath('0.children.0.name', 'Laracon')

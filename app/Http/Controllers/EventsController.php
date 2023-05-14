@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
+
 
 class EventsController extends BaseController
 {
@@ -101,7 +104,16 @@ class EventsController extends BaseController
      */
 
     public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+
+        try {
+            $getEventsWithWorkshops = Event::with('workShops')->get();
+            $eventResource = EventResource::collection($getEventsWithWorkshops);
+            $response = successResponse($eventResource, 'Events and their workshop fetch successfully!!!');
+        } catch (\Exception $e) {
+            $response = errorResponse($e->getMessage());
+        }
+        return $response;
+        //throw new \Exception('implement in coding task 1');
     }
 
 
@@ -179,6 +191,21 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+
+        try {
+            //For Future Events With WorkShops
+            //Condition for workshop start datetime with current datetime
+            $getEventsWithWorkshops = Event::with('workShops')
+                ->whereHas('workShops',function($q) {
+                    $q->where('start','>', date("Y-m-d H:i:s"));
+                })->get();
+
+            $eventResource = EventResource::collection($getEventsWithWorkshops);
+            $response = successResponse($eventResource, 'Events and their workshop fetch successfully!!!');
+        } catch (\Exception $e) {
+            $response = errorResponse($e->getMessage());
+        }
+        return $response;
+        //throw new \Exception('implement in coding task 2');
     }
 }

@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MenuResource;
 use App\Models\MenuItem;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -92,7 +93,37 @@ class MenuController extends BaseController
     ]
      */
 
-    public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+    public function getMenuItems()
+    {
+        //throw new \Exception('implement in coding task 3');
+
+        $rootNodes = MenuItem::with('children')->whereNull('parent_id')->get();
+        $tree = [];
+
+        foreach ($rootNodes as $rootNode) {
+            $tree[] = $this->buildTree($rootNode);
+        }
+
+        return response()->json($tree);
+
+    }
+
+    private function buildTree($node)
+    {
+        $treeNode = [
+            'id' => $node->id,
+            'name' => $node->name,
+            'url' => $node->url,
+            'parent_id' => $node->parent_id,
+            'created_at' => $node->created_at,
+            'updated_at' => $node->updated_at,
+            'children' => [],
+        ];
+
+        foreach ($node->children as $child) {
+            $treeNode['children'][] = $this->buildTree($child);
+        }
+
+        return $treeNode;
     }
 }

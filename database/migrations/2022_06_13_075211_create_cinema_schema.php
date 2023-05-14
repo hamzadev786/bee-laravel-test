@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -36,7 +37,64 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        //throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+
+        // Movies table
+        Schema::create('movies', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('description');
+            $table->string('poster_url');
+            $table->timestamps();
+        });
+
+        // Showrooms table
+        Schema::create('showrooms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('capacity');
+            $table->timestamps();
+        });
+
+        // Shows table
+        Schema::create('shows', function (Blueprint $table) {
+            $table->id();
+            $table->dateTime('start_time');
+            $table->foreignId('movie_id')->references('id')->on('movies');
+            $table->foreignId('showroom_id')->references('id')->on('showrooms');
+            $table->timestamps();
+        });
+
+        // Pricing table
+        Schema::create('pricings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('show_id')->references('id')->on('shows');
+            $table->decimal('base_price', 8, 2);
+            $table->decimal('vip_seat_premium', 8, 2);
+            $table->timestamps();
+        });
+
+        // Seats table
+        Schema::create('seats', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('show_id')->references('id')->on('shows');
+            $table->string('name');
+            $table->integer('row');
+            $table->integer('column');
+            $table->boolean('vip')->default(false);
+            $table->timestamps();
+        });
+
+        // Bookings table
+        Schema::create('bookings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('show_id')->references('id')->on('shows');
+            $table->foreignId('seat_id')->references('id')->on('seats');
+            $table->string('user_name');
+            $table->string('user_email');
+            $table->timestamps();
+        });
+
     }
 
     /**
@@ -46,5 +104,11 @@ class CreateCinemaSchema extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('bookings');
+        Schema::dropIfExists('seats');
+        Schema::dropIfExists('pricings');
+        Schema::dropIfExists('shows');
+        Schema::dropIfExists('showrooms');
+        Schema::dropIfExists('movies');
     }
 }
